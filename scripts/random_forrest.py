@@ -5,8 +5,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.model_selection import train_test_split
 
-from sklearn.tree import DecisionTreeRegressor, plot_tree
-from sklearn import tree
+
 from scripts.data_processing import preprocess_data_for_tree
 
 if __name__ == "__main__":
@@ -19,21 +18,20 @@ if __name__ == "__main__":
 
     X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
 
-    # Základná implementácia
+    #RF model
     rf_model = RandomForestRegressor(
-        n_estimators=100,  # Počet stromov v lese
-        max_depth=15,  # Maximálna hĺbka každého stromu
-        min_samples_split=40,  # Min. vzoriek na rozdelenie uzlu
-        min_samples_leaf=20,  # Min. vzoriek v liste
-        max_features='sqrt',  # Počet príznakov na rozdelenie
-        random_state=42,  # Pre reprodukovateľnosť
-        n_jobs=-1  # Použiť všetky jadra procesora
+        n_estimators=100,  #Number of generated trees
+        max_depth=15,  #Max. depth of each tree
+        min_samples_split=40,  #Min. samples to split node
+        min_samples_leaf=20,  #Min. samples in leaf
+        random_state=42,  #For reproducibility
+        n_jobs=-1  #All cores
     )
 
-    # Trénovanie
+    #Training
     rf_model.fit(X_train, y_train)
 
-    # Predikcia a vyhodnotenie
+    #Evaluate on data
     y_pred = rf_model.predict(X_test)
     y_pred_train = rf_model.predict(X_train)
 
@@ -51,13 +49,13 @@ if __name__ == "__main__":
     print(f"R2 train: {r2_score(y_train, y_pred_train):.3f}")
     print(f"R2 test: {r2_score(y_test, y_pred):.3f}")
 
-    # Dôležitosť príznakov
+    #Importance of features
     feature_importance = pd.DataFrame({
         'feature': X.columns,
         'importance': rf_model.feature_importances_
     }).sort_values('importance', ascending=False)
 
-    # Graf
+    #Graph of feature importance
     plt.figure(figsize=(10, 6))
     plt.barh(feature_importance['feature'][:8],
              feature_importance['importance'][:8])
@@ -66,7 +64,7 @@ if __name__ == "__main__":
     plt.gca().invert_yaxis()
     plt.show()
 
-    # Residuals plot (directly in main, same style as decision_tree.py)
+    #Residuals plot (directly in main, same style as decision_tree.py)
     residuals = y_test - y_pred
 
     plt.figure(figsize=(10, 6))

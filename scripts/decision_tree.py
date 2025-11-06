@@ -9,6 +9,7 @@ from scripts.data_processing import preprocess_data_for_tree
 if __name__ == "__main__":
 
     whole_df = preprocess_data_for_tree()
+    print(whole_df.shape)
 
     #Separate features and target, not need to normalize for tree based models
     X = whole_df.drop('count', axis=1)

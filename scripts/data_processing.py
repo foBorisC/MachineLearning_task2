@@ -72,6 +72,7 @@ def preprocess_data_for_tree()-> pd.DataFrame:
 def preprocess_data_with_cyclical() -> pd.DataFrame:
     df1= preprocess_data_for_tree()
     #Cyclical encoding for month, weekday, hour
+    #Creates cyclical coordinates, so models can see, how close and related are the values to each other
     cyclical_features = CyclicalFeatures(
         variables=['month', 'weekday', 'hour'],
         drop_original=True
@@ -80,5 +81,5 @@ def preprocess_data_with_cyclical() -> pd.DataFrame:
     return df1
 
 if __name__ == "__main__":
-    pass
+    preprocess_data_for_tree()
 

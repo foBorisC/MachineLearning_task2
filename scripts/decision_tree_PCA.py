@@ -1,4 +1,5 @@
 import seaborn as sns
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
@@ -19,10 +20,6 @@ if __name__ == "__main__":
     y = df['count']
     feature_names = X.columns
 
-    # Normalizácia
-    scaler = StandardScaler()
-    X_normalized = scaler.fit_transform(X)
-
     print("=" * 60)
     print("TRÉNOVANIE S PCA TRANSFORMOVANÝMI DÁTAMI")
     print("=" * 60)
@@ -33,9 +30,9 @@ if __name__ == "__main__":
     for variance in variance_levels:
         print(f"\n--- PCA s {variance * 100}% variability ---")
 
-        # PCA transformácia
+        # ✅ SPRÁVNE: PCA LEN na features (BEZ count)
         pca = PCA(n_components=variance)
-        X_pca = pca.fit_transform(X_normalized)
+        X_pca = pca.fit_transform(X)  # Iba features, žiadny count!
 
         print(f"Počet PCA komponentov: {X_pca.shape[1]}")
         print(f"Skutočne zachovaná variabilita: {sum(pca.explained_variance_ratio_) * 100:.1f}%")
@@ -45,13 +42,22 @@ if __name__ == "__main__":
             X_pca, y, test_size=0.2, random_state=42
         )
 
-        # Trénovanie Decision Tree
-        dtree = DecisionTreeRegressor(max_depth=10, random_state=42)
-        dtree.fit(X_train, y_train)
+        # Trénovanie Random Forest
+        rf_model = RandomForestRegressor(
+            n_estimators=100,
+            max_depth=15,
+            min_samples_split=20,
+            min_samples_leaf=10,
+            random_state=42,
+            n_jobs=-1
+        )
 
-        # Evaluate on TRAIN and TEST data
-        y_pred_train = dtree.predict(X_train)
-        y_pred = dtree.predict(X_test)
+        # Trénovanie
+        rf_model.fit(X_train, y_train)
+
+        # Predikcia a vyhodnotenie
+        y_pred = rf_model.predict(X_test)
+        y_pred_train = rf_model.predict(X_train)
 
         mse_test = mean_squared_error(y_test, y_pred)
         rmse_test = np.sqrt(mse_test)
@@ -59,23 +65,20 @@ if __name__ == "__main__":
         mse_train = mean_squared_error(y_train, y_pred_train)
         rmse_train = np.sqrt(mse_train)
 
-        print("Decision Tree Regressor Results:")
-        print(f"MSE (test): {mse_test:.2f}")
-        print(f"RMSE (test): {rmse_test:.2f}")
-        print(f"MSE (train): {mse_train:.2f}")
-        print(f"RMSE (train): {rmse_train:.2f}")
+        print("Random Forest Results:")
         print(f"R2 train: {r2_score(y_train, y_pred_train):.3f}")
         print(f"R2 test: {r2_score(y_test, y_pred):.3f}")
+        print(f"RMSE test: {rmse_test:.2f}")
+        print(f"RMSE train: {rmse_train:.2f}")
 
         # Reziduálny graf
         residuals = y_test - y_pred
-
         plt.figure(figsize=(10, 6))
         plt.scatter(y_pred, residuals, alpha=0.5)
         plt.axhline(y=0, color='red', linestyle='--')
         plt.xlabel('Predpovedané hodnoty')
         plt.ylabel('Reziduá (skutočné - predpovedané)')
-        plt.title(f'Reziduá vs. Predpovedané hodnoty (PCA {variance * 100}% variability)')
+        plt.title(f'Reziduá vs. Predpovedané (PCA {variance * 100}% variability)')
         plt.show()
 
     # Porovnanie so všetkými príznakmi (bez PCA)
@@ -85,12 +88,17 @@ if __name__ == "__main__":
         X, y, test_size=0.2, random_state=42
     )
 
-    dtree_all = DecisionTreeRegressor(max_depth=10, random_state=42)
-    dtree_all.fit(X_train_all, y_train)
+    # Použite rovnaký Random Forest pre konzistentné porovnanie
+    rf_all = RandomForestRegressor(
+        n_estimators=100,
+        max_depth=15,
+        min_samples_split=20,
+        min_samples_leaf=10,
+        random_state=42,
+        n_jobs=-1
+    )
+    rf_all.fit(X_train_all, y_train)
 
-    y_pred_train_all = dtree_all.predict(X_train_all)
-    y_pred_all = dtree_all.predict(X_test_all)
-
-    print(f"R2 train: {r2_score(y_train, y_pred_train_all):.3f}")
-    print(f"R2 test: {r2_score(y_test, y_pred_all):.3f}")
-    print(f"RMSE test: {np.sqrt(mean_squared_error(y_test, y_pred_all)):.2f}")
+    y_pred_all = rf_all.predict(X_test_all)
+    print(f"R2 test (bez PCA): {r2_score(y_test, y_pred_all):.3f}")
+    print(f"RMSE test (bez PCA): {np.sqrt(mean_squared_error(y_test, y_pred_all)):.2f}")

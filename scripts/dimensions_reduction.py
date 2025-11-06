@@ -25,12 +25,12 @@ if __name__ == "__main__":
     fig = plt.figure(figsize=(14, 12))
     ax = fig.add_subplot(111, projection='3d')
 
-    # 3D scatter plot
+    #3D scatter plot
     scatter = ax.scatter(
-        df['weekday'],  # X os - hodina
-        df['temperature'],  # Y os - teplota
-        df['month'],  # Z os - pracovný deň
-        c=df['count'],  # Farba podľa počtu bicyklov
+        df['weekday'],  # X-axis - day of the week
+        df['temperature'],  # Y-axis - temperature
+        df['month'],  # Z-axis - month of the year
+        c=df['count'],  # Color by bike count
         cmap='viridis',
         alpha=0.6
     )
@@ -46,22 +46,22 @@ if __name__ == "__main__":
         2. Časť
     
     '''
-    # Normalizácia
+    #Normalisation
     scaler = StandardScaler()
     X_normalized = scaler.fit_transform(df.drop('count', axis=1))
 
-    # Redukcia na 3 dimenzie
+    #Reduction with PCA
     pca = PCA(n_components=3)
     X_pca = pca.fit_transform(X_normalized)
 
-    # Vizualizácia PCA výsledkov
+    #Visualization
     fig = plt.figure(figsize=(12, 8))
     ax = fig.add_subplot(111, projection='3d')
 
     scatter = ax.scatter(
-        X_pca[:, 0],  # Prvá hlavná zložka
-        X_pca[:, 1],  # Druhá hlavná zložka
-        X_pca[:, 2],  # Tretia hlavná zložka
+        X_pca[:, 0],
+        X_pca[:, 1],
+        X_pca[:, 2],
         c=df['count'],
         cmap='viridis',
         alpha=0.6

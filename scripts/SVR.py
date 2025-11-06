@@ -1,14 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-from sklearn.ensemble import RandomForestRegressor
+
 from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
-
-from sklearn.tree import DecisionTreeRegressor, plot_tree
-from sklearn import tree
 from scripts.data_processing import preprocess_data_with_cyclical
 
 if __name__ == "__main__":
@@ -26,12 +22,12 @@ if __name__ == "__main__":
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
 
-    #Základný SVR
+    #SVR model
     svr_model = SVR(
-        kernel='rbf',  # Typ jadra
-        C=69.0,  # Regularizácia
-        epsilon=5,  # Šírka pásu tolerancie
-        gamma='scale'  # Šírka RBF jadra
+        kernel='rbf',  #Type of kernel
+        C=69.0,  #Regularization parameter
+        epsilon=5,
+        gamma='scale'  #Kernel coefficient
     )
 
     #Trénovanie
