@@ -11,10 +11,11 @@ if __name__ == "__main__":
     whole_df = preprocess_data_for_tree()
 
     #Separate features and target, not need to normalize for tree based models
-    X = whole_df.drop('count', axis=1)
+    selected_features = ['hour', 'temperature', 'humidity', 'month']
+    X_corr = whole_df[selected_features]
     Y = whole_df['count']
 
-    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X_corr, Y, test_size=0.3, random_state=42)
 
     dtree = DecisionTreeRegressor(max_depth=15, random_state=42,min_samples_split=40, min_samples_leaf=20)
     dtree = dtree.fit(X_train, y_train)

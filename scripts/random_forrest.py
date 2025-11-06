@@ -36,8 +36,18 @@ if __name__ == "__main__":
     # Predikcia a vyhodnotenie
     y_pred = rf_model.predict(X_test)
     y_pred_train = rf_model.predict(X_train)
-    print(f"MSE: {mean_squared_error(y_test, y_pred):.2f}")
-    print(f"RMSE: {np.sqrt(mean_squared_error(y_test, y_pred)):.2f}")
+
+    mse_test = mean_squared_error(y_test, y_pred)
+    rmse_test = np.sqrt(mse_test)
+
+    mse_train = mean_squared_error(y_train, y_pred_train)
+    rmse_train = np.sqrt(mse_train)
+
+    print("Random Forest Regressor Results:")
+    print(f"MSE (test): {mse_test:.2f}")
+    print(f"RMSE (test): {rmse_test:.2f}")
+    print(f"MSE (train): {mse_train:.2f}")
+    print(f"RMSE (train): {rmse_train:.2f}")
     print(f"R2 train: {r2_score(y_train, y_pred_train):.3f}")
     print(f"R2 test: {r2_score(y_test, y_pred):.3f}")
 
@@ -64,6 +74,6 @@ if __name__ == "__main__":
     plt.axhline(y=0, color='red', linestyle='--')
     plt.xlabel('Predpovedané hodnoty')
     plt.ylabel('Reziduá (skutočné - predpovedané)')
-    plt.title('Reziduá vs. Predpovedané hodnoty')
+    plt.title('Reziduá vs. Predpovedané hodnoty RandomForest')
     plt.grid(alpha=0.3)
     plt.show()

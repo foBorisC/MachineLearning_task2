@@ -40,7 +40,29 @@ if __name__ == "__main__":
     #Predikcia a vyhodnotenie
     y_pred = svr_model.predict(X_test_scaled)
     y_pred_train = svr_model.predict(X_train_scaled)
-    print(f"MSE: {mean_squared_error(y_test, y_pred):.2f}")
-    print(f"RMSE: {np.sqrt(mean_squared_error(y_test, y_pred)):.2f}")
+
+    mse_test = mean_squared_error(y_test, y_pred)
+    rmse_test = np.sqrt(mse_test)
+
+    mse_train = mean_squared_error(y_train, y_pred_train)
+    rmse_train = np.sqrt(mse_train)
+
+    print("Support Vector Regressor Results:")
+    print(f"MSE (test): {mse_test:.2f}")
+    print(f"RMSE (test): {rmse_test:.2f}")
+    print(f"MSE (train): {mse_train:.2f}")
+    print(f"RMSE (train): {rmse_train:.2f}")
     print(f"R2 train: {r2_score(y_train, y_pred_train):.3f}")
     print(f"R2 test: {r2_score(y_test, y_pred):.3f}")
+
+
+    residuals = y_test - y_pred
+
+    plt.figure(figsize=(10, 6))
+    plt.scatter(y_pred, residuals, alpha=0.5)
+    plt.axhline(y=0, color='red', linestyle='--')
+    plt.xlabel('Predpovedané hodnoty')
+    plt.ylabel('Reziduá (skutočné - predpovedané)')
+    plt.title('Reziduá vs. Predpovedané hodnoty SVR')
+    plt.grid(alpha=0.3)
+    plt.show()
